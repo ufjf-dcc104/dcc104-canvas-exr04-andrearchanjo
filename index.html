@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>DCC104 - CANVAS 04</title>
+    <script src="AudioLoader.js" charset="utf-8"></script>
+    <script src="CriarFase.js" charset="utf-8"></script>
+    <script src="ImageLoader.js" charset="utf-8"></script>
+    <script src="Inimigo.js" charset="utf-8"></script>
+    <script src="Level.js" charset="utf-8"></script>
+    <script src="Sprite.js" charset="utf-8"></script>
+    <script src="Player.js" charset="utf-8"></script>
+  </head>
+  <body>
+
+  <h1>DCC104 - CANVAS 04</h1>
+  <canvas></canvas>
+  <script>
+
+    var eCanvas = document.getElementsByTagName("canvas")[0];
+    eCanvas.width = 480;
+    eCanvas.height = 480;
+    var ctx = eCanvas.getContext("2d");
+
+    var il = new ImageLoader();
+    il.load("player", "imagens/player1.png");
+    il.load("shot", "imagens/shot.png");
+    il.load("explosion", "imagens/explosion.png");
+    il.load("galaxy", "imagens/galaxy.png");
+    il.load("build", "imagens/edificio.png");
+    il.load("mira", "imagens/mira.jpg");
+    il.load("asteroide", "imagens/asteroide.png")
+
+    var al = new AudioLoader();
+    al.load("shot", "audios/Missle_Launch-Kibblesbob-2118796725.mp3");
+    al.load("boom", "audios/Grenade-SoundBible.com-1777900486.mp3");
+    al.load("background", "audios/Demonstar.mp3");
+    al.load("gameover", "audios/RE4 - Game Over.mp3");
+    al.load("victory", "audios/Final Fantasy IX Fanfare Ringtone.mp3");
+
+    var ultimaFase = 5;
+    var fps = 120;
+    var atual = new Date();
+    var anterior = new Date();
+    var dt = 1/fps;
+
+    var player = new Player();
+    player.x = 240;
+    player.y = 400;
+
+    var key = new CriarFase();
+
+    var level = new Level();
+
+    level.init();
+
+    level.initMira();
+
+    desenha();
+
+    function desenha(){
+  	  requestAnimationFrame(desenha);
+      //al.play("background");
+      atual = new Date();
+      dt = (atual - anterior)/1000;
+      ctx.clearRect(0,0,eCanvas.width, eCanvas.height);
+      ctx.strokeRect(0,0,eCanvas.width, eCanvas.height);
+      //ctx.drawImage("galaxy", 0, 0);
+      ctx.fillStyle = "darkgreen";
+      ctx.font='20px Arial';
+      //ctx.fillText("dt: "+dt+" fps:"+Math.floor(1/dt), 10, 10);
+      ctx.fillText("Score: " + level.score, 10, 20);
+      ctx.fillText("Life: " + level.life, 10, 40)
+
+      if(level.playerLife(ctx, al, "gameover")){
+        if(level.inimigos == 0 && level.end){
+          level.victory(ctx, al, "victory");
+          console.log("Fim do Jogo");  
+        } else {
+          if(level.inimigos == 0){
+            var enemys = key.ondas(level.fases);
+            //console.log(enemys);
+            if(enemys != null){
+              level.recebeInimigo(enemys, enemys.length);
+              level.fases.fase++;
+              if(level.fases.fase == ultimaFase){
+                level.end = true;
+              }
+              //console.log(level.fases.fase);
+            }
+          }
+
+          level.mover(dt);
+
+          level.colidiuCom(player,
+            function(inimigo, alvo){
+              console.log("Ocorreu uma colisão");         
+            }
+          );
+
+          player.desenharImg(ctx, il.images["player"]);
+
+          level.desenharImg(ctx, il);
+
+          level.desenhar(ctx);
+
+          level.colidiuComTiros(al,"boom");
+          level.colidiuComBuilds(al, "boom");
+          //level.colidiuComPlayer(player, al,"boom");
+
+          level.moverMira(dt);
+
+          level.movimento(ctx);
+
+          anterior = atual;
+        }
+      } 
+    }
+
+    addEventListener("keydown", function(e){
+        switch (e.keyCode) {
+          case 13:
+            if(!level.playerLife(ctx) || level.end){
+              level.life = 3;
+              level.fases.fase = 1;
+              level.score = 0;
+              level.message = "";
+              level.music = true;
+              level.end = false;
+              player.x = 240;
+              player.y = 458;
+            }
+            break;
+          case 32:
+            if(level.playerLife(ctx) && !level.end)
+              level.fire(player, level.mira, al, "shot", 0.5);
+            break;
+          case 37:
+            level.mira.vx = -100;
+            break;
+          case 38:
+            level.mira.vy = -100;
+            break;
+          case 39:
+            level.mira.vx = +100;
+            break;
+          case 40:
+            level.mira.vy = +100;
+            break;
+          default:
+
+        }
+      });
+      addEventListener("keyup", function(e){
+        switch (e.keyCode) {
+          case 37:
+            level.mira.vx = 0;
+            break;
+          case 38:
+            level.mira.vy = 0;
+            break;
+          case 39:
+            level.mira.vx = 0;
+          case 40:
+            level.mira.vy = 0;
+            break;
+          default:
+
+        }
+      });
+
+  </script>
+  </body>
+
+</html>
