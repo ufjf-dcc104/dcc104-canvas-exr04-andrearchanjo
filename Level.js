@@ -146,12 +146,21 @@ Level.prototype.fire = function (alvo, mira, audiolib, key, vol){
   tiro.width = 8;
   tiro.height = 16;
   tiro.imgkey = "shot";
+  alvo.cooldown = 1;
   //tiro.vx = mira.x - alvo.x;
   //console.log(mira.y - alvo.y);
   //console.log(Math.round((mira.y - alvo.y)/(mira.x - alvo.x)));
   this.shots.push(tiro);
   if(audiolib && key) audiolib.play(key,vol);
 };
+
+Level.prototype.cooldownTiro = function (alvo){
+  if(alvo.cooldown>0) {
+    alvo.cooldown -= dt;
+  } else {
+    alvo.cooldown = 0;
+  }
+}
 
 Level.prototype.colidiuComTiros = function(al, key){
   var that = this;

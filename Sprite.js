@@ -83,10 +83,10 @@ Sprite.prototype.moverAng = function (dt) {
 
 
 Sprite.prototype.colidiuCom = function (alvo) {
-  if(this.x + this.width < alvo.x)   return false;  // colisão pela esquerda
-  if(this.x > alvo.x + alvo.width)   return false;  // colisão pela direita
-  if(this.y + this.height < alvo.y)  return false;  //  colisão por cima
-  if(this.y > alvo.y + alvo.height)  return false;  // colisão por baixo
+  if(this.x + this.width/2 < alvo.x - alvo.width/2)   return false;  // colisão pela esquerda
+  if(this.x - this.width/2 > alvo.x + alvo.width/2)   return false;  // colisão pela direita
+  if(this.y + this.height/2 < alvo.y - alvo.height/2)  return false;  //  colisão por cima
+  if(this.y - this.height/2 > alvo.y + alvo.height/2)  return false;  // colisão por baixo
   return true;
 };
 

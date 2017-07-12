@@ -52,10 +52,10 @@ Player.prototype.colidiuCenario = function (ctx) {
 };
 
 Player.prototype.colidiuCom = function (inimigo) {
-  if(this.x+this.width < inimigo.x) return false;
-  if(this.x > inimigo.x+this.width) return false;
-  if(this.y+this.height < inimigo.y) return false;
-  if(this.y > inimigo.y+this.height) return false;
+  if(this.x + this.width/2 < alvo.x - alvo.width/2)   return false;  // colisão pela esquerda
+  if(this.x - this.width/2 > alvo.x + alvo.width/2)   return false;  // colisão pela direita
+  if(this.y + this.height/2 < alvo.y - alvo.height/2)  return false;  //  colisão por cima
+  if(this.y - this.height/2 > alvo.y + alvo.height/2)  return false;  // colisão por baixo
   return true;
 };
 
